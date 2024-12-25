@@ -10,16 +10,17 @@
     <header>
         <h1>ATM Mutation Research Dashboard</h1>
     </header>
-    <main>
+    <main class="container">
         <!-- Criteria Section -->
         <section>
             <h2>Set Criteria</h2>
             <div id="criteria-section">
                 <label for="inclusion"><strong>Inclusion Keywords:</strong></label>
-                <textarea id="inclusion" rows="3" placeholder="Enter inclusion keywords (e.g., ATM gene mutation, breast cancer risk) separated by commas..."></textarea>
+                <textarea id="inclusion" rows="3" placeholder="Enter inclusion keywords (e.g., ATM gene mutation, breast cancer risk) separated by commas..." aria-label="Inclusion Keywords"></textarea>
                 <label for="exclusion"><strong>Exclusion Keywords:</strong></label>
-                <textarea id="exclusion" rows="3" placeholder="Enter exclusion keywords separated by commas..."></textarea>
+                <textarea id="exclusion" rows="3" placeholder="Enter exclusion keywords separated by commas..." aria-label="Exclusion Keywords"></textarea>
                 <button id="setCriteriaBtn">Set Criteria</button>
+                <p id="criteria-status" class="status-message"></p>
             </div>
         </section>
 
@@ -28,9 +29,12 @@
             <h2>Upload and Process PDFs</h2>
             <div id="upload-section">
                 <label for="pdfUploader"><strong>Upload PDF Files:</strong></label>
-                <input type="file" id="pdfUploader" multiple accept=".pdf">
+                <input type="file" id="pdfUploader" multiple accept=".pdf" aria-label="Upload PDF files">
                 <button id="processPdfsBtn">Process PDFs</button>
                 <div id="upload-status"></div>
+                <ul id="uploaded-files-list">
+                    <!-- Dynamically populated list of uploaded files -->
+                </ul>
             </div>
         </section>
 
@@ -52,14 +56,50 @@
                     <!-- Data will be dynamically populated by JavaScript -->
                 </tbody>
             </table>
-            <canvas id="riskChart" width="800" height="400"></canvas>
+            <canvas id="riskChart" width="800" height="400" aria-label="Risk Chart"></canvas>
         </section>
     </main>
 
     <footer>
-        <p>© 2024 ATM Mutation Research Dashboard. All rights reserved.</p>
+        <p>&copy; 2024 ATM Mutation Research Dashboard. All rights reserved.</p>
     </footer>
 
-    <script src="app.js"></script>
+    <script>
+        document.getElementById('setCriteriaBtn').addEventListener('click', () => {
+            const inclusion = document.getElementById('inclusion').value.trim();
+            const exclusion = document.getElementById('exclusion').value.trim();
+            const criteriaStatus = document.getElementById('criteria-status');
+
+            if (!inclusion || !exclusion) {
+                criteriaStatus.textContent = 'Please fill out both inclusion and exclusion keywords.';
+                criteriaStatus.style.color = 'red';
+                return;
+            }
+
+            criteriaStatus.textContent = 'Criteria successfully set.';
+            criteriaStatus.style.color = 'green';
+        });
+
+        document.getElementById('processPdfsBtn').addEventListener('click', () => {
+            const pdfUploader = document.getElementById('pdfUploader');
+            const uploadedFilesList = document.getElementById('uploaded-files-list');
+            uploadedFilesList.innerHTML = '';
+
+            Array.from(pdfUploader.files).forEach((file, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = file.name;
+
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.className = 'remove-btn';
+                removeButton.addEventListener('click', () => {
+                    listItem.remove();
+                });
+
+                listItem.appendChild(removeButton);
+                uploadedFilesList.appendChild(listItem);
+            });
+        });
+    </script>
 </body>
 </html>
