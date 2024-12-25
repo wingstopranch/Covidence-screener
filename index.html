@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATM Dashboard</title>
+    <title>ATM Mutation Research Dashboard</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -15,10 +15,10 @@
         <section>
             <h2>Set Criteria</h2>
             <div id="criteria-section">
-                <label for="inclusion">Inclusion Keywords:</label>
-                <textarea id="inclusion" rows="3" placeholder="Enter inclusion criteria keywords, separated by commas..."></textarea>
-                <label for="exclusion">Exclusion Keywords:</label>
-                <textarea id="exclusion" rows="3" placeholder="Enter exclusion criteria keywords, separated by commas..."></textarea>
+                <label for="inclusion"><strong>Inclusion Keywords:</strong></label>
+                <textarea id="inclusion" rows="3" placeholder="Enter inclusion keywords (e.g., ATM gene mutation, breast cancer risk) separated by commas..."></textarea>
+                <label for="exclusion"><strong>Exclusion Keywords:</strong></label>
+                <textarea id="exclusion" rows="3" placeholder="Enter exclusion keywords separated by commas..."></textarea>
                 <button id="setCriteriaBtn">Set Criteria</button>
             </div>
         </section>
@@ -27,6 +27,7 @@
         <section>
             <h2>Upload and Process PDFs</h2>
             <div id="upload-section">
+                <label for="pdfUploader"><strong>Upload PDF Files:</strong></label>
                 <input type="file" id="pdfUploader" multiple accept=".pdf">
                 <button id="processPdfsBtn">Process PDFs</button>
                 <div id="upload-status"></div>
@@ -56,7 +57,7 @@
     </main>
 
     <footer>
-        <p>© 2024 ATM Mutation Research Dashboard</p>
+        <p>© 2024 ATM Mutation Research Dashboard. All rights reserved.</p>
     </footer>
 
     <script src="app.js"></script>
