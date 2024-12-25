@@ -5,8 +5,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Set Criteria
     document.getElementById("setCriteriaBtn").addEventListener("click", () => {
-        inclusionKeywords = document.getElementById("inclusion").value.split(",").map(k => k.trim().toLowerCase());
-        exclusionKeywords = document.getElementById("exclusion").value.split(",").map(k => k.trim().toLowerCase());
+        const inclusionInput = document.getElementById("inclusion").value.trim();
+        const exclusionInput = document.getElementById("exclusion").value.trim();
+
+        if (!inclusionInput && !exclusionInput) {
+            alert("Please enter at least one inclusion or exclusion keyword.");
+            return;
+        }
+
+        inclusionKeywords = inclusionInput.split(",").map(k => k.trim().toLowerCase());
+        exclusionKeywords = exclusionInput.split(",").map(k => k.trim().toLowerCase());
+
         alert("Criteria set successfully!");
     });
 
@@ -19,22 +28,41 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const statusDiv = document.getElementById("upload-status");
-        statusDiv.innerHTML = "";
+        statusDiv.innerHTML = ""; // Clear previous results
 
         Array.from(files).forEach(file => {
             const reader = new FileReader();
             reader.onload = function (e) {
                 const text = e.target.result.toLowerCase();
 
-                const includesKeywords = inclusionKeywords.every(keyword => text.includes(keyword));
+                const includesAllKeywords = inclusionKeywords.every(keyword => text.includes(keyword));
+                const includesPartialKeywords = inclusionKeywords.some(keyword => text.includes(keyword));
                 const excludesKeywords = exclusionKeywords.some(keyword => text.includes(keyword));
 
                 const result = document.createElement("div");
-                result.textContent = `File: ${file.name} - ${includesKeywords && !excludesKeywords ? "Meets Criteria" : "Does Not Meet Criteria"}`;
+
+                if (includesAllKeywords && !excludesKeywords) {
+                    result.textContent = `File: ${file.name} - Meets All Criteria`;
+                    result.style.color = "green";
+                } else if (includesPartialKeywords && !excludesKeywords) {
+                    result.textContent = `File: ${file.name} - Partially Meets Criteria`;
+                    result.style.color = "orange";
+                } else {
+                    result.textContent = `File: ${file.name} - Does Not Meet Criteria`;
+                    result.style.color = "red";
+                }
+
                 statusDiv.appendChild(result);
             };
 
-            reader.readAsText(file);
+            reader.onerror = function () {
+                const errorResult = document.createElement("div");
+                errorResult.textContent = `Error reading file: ${file.name}`;
+                errorResult.style.color = "red";
+                statusDiv.appendChild(errorResult);
+            };
+
+            reader.readAsText(file); // Read file as text for keyword analysis
         });
     });
 
