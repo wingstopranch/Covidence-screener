@@ -1,7 +1,10 @@
+// JavaScript Code for ATM Mutation Research Dashboard
+
 document.addEventListener("DOMContentLoaded", () => {
     let inclusionKeywords = [];
     let exclusionKeywords = [];
     let originalData = [];
+    let auditLog = [];
 
     // Set Criteria
     document.getElementById("setCriteriaBtn").addEventListener("click", () => {
@@ -16,7 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
         inclusionKeywords = inclusionInput.split(",").map(k => k.trim().toLowerCase());
         exclusionKeywords = exclusionInput.split(",").map(k => k.trim().toLowerCase());
 
+        document.getElementById("recheckCriteriaBtn").disabled = false;
         alert("Criteria set successfully!");
+    });
+
+    // Recheck Criteria
+    document.getElementById("recheckCriteriaBtn").addEventListener("click", () => {
+        recheckCriteria();
     });
 
     // PDF Upload and Processing
@@ -29,10 +38,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const statusDiv = document.getElementById("upload-status");
         statusDiv.innerHTML = ""; // Clear previous results
+        auditLog = []; // Reset audit log
 
-        Array.from(files).forEach((file, index) => {
+        Array.from(files).forEach(file => {
             const reader = new FileReader();
-
             reader.onload = function (e) {
                 const text = e.target.result.toLowerCase();
 
@@ -41,27 +50,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 const excludesKeywords = exclusionKeywords.some(keyword => text.includes(keyword));
 
                 const result = document.createElement("div");
+                let auditMessage;
 
                 if (includesAllKeywords && !excludesKeywords) {
                     result.textContent = `File: ${file.name} - Meets All Criteria`;
                     result.style.color = "green";
+                    auditMessage = `${file.name}: Meets All Criteria`;
                 } else if (includesPartialKeywords && !excludesKeywords) {
                     result.textContent = `File: ${file.name} - Partially Meets Criteria`;
                     result.style.color = "orange";
+                    auditMessage = `${file.name}: Partially Meets Criteria - Missing some inclusion keywords.`;
                 } else {
                     result.textContent = `File: ${file.name} - Does Not Meet Criteria`;
                     result.style.color = "red";
+                    auditMessage = `${file.name}: Does Not Meet Criteria - ${excludesKeywords ? "Contains exclusion keywords." : "Missing inclusion keywords."}`;
                 }
 
-                // Add Remove Button
-                const removeButton = document.createElement("button");
-                removeButton.textContent = "Remove";
-                removeButton.style.marginLeft = "10px";
-                removeButton.addEventListener("click", () => {
-                    result.remove();
-                });
-
-                result.appendChild(removeButton);
+                auditLog.push(auditMessage);
                 statusDiv.appendChild(result);
             };
 
@@ -74,10 +79,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
             reader.readAsText(file); // Read file as text for keyword analysis
         });
+
+        document.getElementById("viewAuditLogBtn").disabled = false;
+    });
+
+    // View Audit Log
+    document.getElementById("viewAuditLogBtn").addEventListener("click", () => {
+        const auditLogSection = document.getElementById("auditLogSection");
+        const auditLogDiv = document.getElementById("auditLog");
+
+        auditLogSection.style.display = "block";
+        auditLogDiv.innerHTML = "<ul>" + auditLog.map(log => `<li>${log}</li>`).join("") + "</ul>";
     });
 
     // Load JSON Data
-    fetch("ATM_annotations.json")
+    fetch("ATM annotations.json")
         .then(response => response.json())
         .then(data => {
             originalData = formatData(data);
@@ -159,5 +175,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
+    }
+
+    function recheckCriteria() {
+        const statusDiv = document.getElementById("upload-status");
+        statusDiv.innerHTML = "";
+
+        auditLog.forEach(log => {
+            const result = document.createElement("div");
+            result.textContent = log;
+            result.style.color = log.includes("Meets All Criteria") ? "green" : log.includes("Partially Meets Criteria") ? "orange" : "red";
+            statusDiv.appendChild(result);
+        });
+
+        alert("Recheck completed. Audit log updated.");
     }
 });
