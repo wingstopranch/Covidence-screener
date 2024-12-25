@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATM Mutation Research Dashboard</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Added Chart.js -->
 </head>
 <body>
     <header>
@@ -21,6 +20,7 @@
                 <label for="exclusion"><strong>Exclusion Keywords:</strong></label>
                 <textarea id="exclusion" rows="3" placeholder="Enter exclusion keywords separated by commas..."></textarea>
                 <button id="setCriteriaBtn">Set Criteria</button>
+                <button id="recheckCriteriaBtn" disabled>Recheck Criteria</button>
             </div>
         </section>
 
@@ -31,7 +31,7 @@
                 <label for="pdfUploader"><strong>Upload PDF Files:</strong></label>
                 <input type="file" id="pdfUploader" multiple accept=".pdf">
                 <button id="processPdfsBtn">Process PDFs</button>
-                <button id="recheckBtn" style="display: none;">Recheck Criteria</button> <!-- Recheck Criteria Button -->
+                <button id="viewAuditLogBtn" disabled>View Audit Log</button>
                 <div id="upload-status"></div>
             </div>
         </section>
@@ -58,14 +58,11 @@
         </section>
 
         <!-- Audit Log Section -->
-        <section>
+        <section id="auditLogSection" style="display: none;">
             <h2>Audit Log</h2>
-            <button id="viewAuditLogBtn">View Audit Log</button>
-            <div id="auditLog" style="display: none;">
-                <h3>Audit Log</h3>
-                <ul id="auditLogList"></ul>
-            </div>
+            <div id="auditLog"></div>
         </section>
+
     </main>
 
     <footer>
