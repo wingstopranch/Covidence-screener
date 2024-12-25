@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
             reader.onload = function (e) {
                 const text = e.target.result.toLowerCase();
 
-                const includesKeywords = inclusionKeywords.some(keyword => text.includes(keyword));
+                const includesKeywords = inclusionKeywords.every(keyword => text.includes(keyword));
                 const excludesKeywords = exclusionKeywords.some(keyword => text.includes(keyword));
 
                 const result = document.createElement("div");
