@@ -30,8 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const statusDiv = document.getElementById("upload-status");
         statusDiv.innerHTML = ""; // Clear previous results
 
-        Array.from(files).forEach(file => {
+        Array.from(files).forEach((file, index) => {
             const reader = new FileReader();
+
             reader.onload = function (e) {
                 const text = e.target.result.toLowerCase();
 
@@ -52,6 +53,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     result.style.color = "red";
                 }
 
+                // Add Remove Button
+                const removeButton = document.createElement("button");
+                removeButton.textContent = "Remove";
+                removeButton.style.marginLeft = "10px";
+                removeButton.addEventListener("click", () => {
+                    result.remove();
+                });
+
+                result.appendChild(removeButton);
                 statusDiv.appendChild(result);
             };
 
@@ -67,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Load JSON Data
-    fetch("ATM annotations.json")
+    fetch("ATM_annotations.json")
         .then(response => response.json())
         .then(data => {
             originalData = formatData(data);
