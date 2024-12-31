@@ -49,21 +49,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 const includesPartialKeywords = inclusionKeywords.some(keyword => text.includes(keyword));
                 const excludesKeywords = exclusionKeywords.some(keyword => text.includes(keyword));
 
+                // Check against JSON Data
+                const jsonMatches = checkAgainstJson(text);
+
                 const result = document.createElement("div");
                 let auditMessage;
 
-                if (includesAllKeywords && !excludesKeywords) {
-                    result.textContent = `File: ${file.name} - Meets All Criteria`;
+                if (includesAllKeywords && jsonMatches && !excludesKeywords) {
+                    result.textContent = `File: ${file.name} - Meets All Criteria (Keywords and JSON)`;
                     result.style.color = "green";
-                    auditMessage = `${file.name}: Meets All Criteria`;
-                } else if (includesPartialKeywords && !excludesKeywords) {
+                    auditMessage = `${file.name}: Meets All Criteria (Keywords and JSON)`;
+                } else if ((includesPartialKeywords || jsonMatches) && !excludesKeywords) {
                     result.textContent = `File: ${file.name} - Partially Meets Criteria`;
                     result.style.color = "orange";
-                    auditMessage = `${file.name}: Partially Meets Criteria - Missing some inclusion keywords.`;
+                    auditMessage = `${file.name}: Partially Meets Criteria - Missing some inclusion keywords or partial JSON match.`;
                 } else {
                     result.textContent = `File: ${file.name} - Does Not Meet Criteria`;
                     result.style.color = "red";
-                    auditMessage = `${file.name}: Does Not Meet Criteria - ${excludesKeywords ? "Contains exclusion keywords." : "Missing inclusion keywords."}`;
+                    auditMessage = `${file.name}: Does Not Meet Criteria - ${excludesKeywords ? "Contains exclusion keywords." : "Missing inclusion keywords or no JSON match."}`;
                 }
 
                 auditLog.push(auditMessage);
@@ -77,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 statusDiv.appendChild(errorResult);
             };
 
-            reader.readAsText(file); // Read file as text for keyword analysis
+            reader.readAsText(file); // Read file as text for keyword and JSON analysis
         });
 
         document.getElementById("viewAuditLogBtn").disabled = false;
@@ -124,6 +127,14 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
         return formatted;
+    }
+
+    function checkAgainstJson(text) {
+        return originalData.some(entry => {
+            return Object.values(entry).some(value =>
+                typeof value === "string" && text.includes(value.toLowerCase())
+            );
+        });
     }
 
     function populateTable(data) {
