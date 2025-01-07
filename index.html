@@ -19,6 +19,8 @@
                 <textarea id="inclusion" rows="3" placeholder="Enter inclusion keywords (e.g., ATM gene mutation, breast cancer risk) separated by commas..."></textarea>
                 <label for="exclusion"><strong>Exclusion Keywords:</strong></label>
                 <textarea id="exclusion" rows="3" placeholder="Enter exclusion keywords separated by commas..."></textarea>
+                <label for="keywordWeights"><strong>Keyword Weights (Optional):</strong></label>
+                <textarea id="keywordWeights" rows="3" placeholder="Enter keywords with weights (e.g., ATM:5, gene:3)..."></textarea>
                 <button id="setCriteriaBtn">Set Criteria</button>
                 <button id="recheckCriteriaBtn" disabled>Recheck Criteria</button>
             </div>
@@ -39,6 +41,10 @@
         <!-- Dashboard Section -->
         <section>
             <h2>Research Dashboard</h2>
+            <div class="dashboard-controls">
+                <button id="sortTableBtn">Sort Table</button>
+                <button id="filterTableBtn">Filter Table</button>
+            </div>
             <table id="riskTable">
                 <thead>
                     <tr>
@@ -72,6 +78,17 @@
 
                 <h3>JSON Matches</h3>
                 <div id="jsonMatches"></div>
+            </div>
+        </section>
+
+        <!-- AI Feedback Section -->
+        <section>
+            <h2>AI Feedback</h2>
+            <div id="aiFeedbackSection">
+                <label for="aiQuery"><strong>Ask AI:</strong></label>
+                <textarea id="aiQuery" rows="3" placeholder="Enter your query for AI feedback..."></textarea>
+                <button id="askAiBtn">Submit Query</button>
+                <div id="aiFeedback"></div>
             </div>
         </section>
 
