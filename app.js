@@ -1,5 +1,3 @@
-// Updated JavaScript Code for ATM Mutation Research Dashboard
-
 document.addEventListener("DOMContentLoaded", () => {
     let inclusionKeywords = [];
     let exclusionKeywords = [];
@@ -62,53 +60,42 @@ document.addEventListener("DOMContentLoaded", () => {
         statusDiv.innerHTML = ""; // Clear previous results
         auditLog = []; // Reset audit log
 
-        Array.from(files).forEach((file) => {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const text = e.target.result.toLowerCase();
+        const formData = new FormData();
+        Array.from(files).forEach((file) => formData.append("files", file));
+        formData.append("inclusionKeywords", inclusionKeywords.join(","));
+        formData.append("exclusionKeywords", exclusionKeywords.join(","));
 
-                // Keyword Matching
-                let score = 0;
-                inclusionKeywords.forEach((keyword) => {
-                    if (text.includes(keyword)) {
-                        score += keywordWeights[keyword] || 1; // Add weight if available
-                    }
-                });
+        // Send files and keywords to the backend for AI processing
+        fetch("/process-files", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => response.json())
+            .then((results) => {
+                displayResults(results);
+            })
+            .catch((error) => {
+                console.error("Error processing PDFs:", error);
+                alert("An error occurred while processing your files.");
+            });
+    });
 
-                const excludes = exclusionKeywords.some((keyword) => text.includes(keyword));
+    function displayResults(results) {
+        const statusDiv = document.getElementById("upload-status");
+        statusDiv.innerHTML = ""; // Clear previous results
 
-                // Check against JSON Data
-                const jsonMatches = checkAgainstJson(text);
+        results.forEach((result) => {
+            const div = document.createElement("div");
+            div.textContent = result.message;
+            div.style.color = result.isRelevant ? "green" : "red";
+            statusDiv.appendChild(div);
 
-                const result = document.createElement("div");
-                let auditMessage;
-
-                if (!excludes && (score > 0 || jsonMatches)) {
-                    result.textContent = `File: ${file.name} - Relevant (Score: ${score}, JSON Match: ${jsonMatches})`;
-                    result.style.color = "green";
-                    auditMessage = `${file.name}: Relevant (Score: ${score}, JSON Match: ${jsonMatches})`;
-                } else {
-                    result.textContent = `File: ${file.name} - Not Relevant.`;
-                    result.style.color = "red";
-                    auditMessage = `${file.name}: Not Relevant.`;
-                }
-
-                auditLog.push(auditMessage);
-                statusDiv.appendChild(result);
-            };
-
-            reader.onerror = function () {
-                const errorResult = document.createElement("div");
-                errorResult.textContent = `Error reading file: ${file.name}`;
-                errorResult.style.color = "red";
-                statusDiv.appendChild(errorResult);
-            };
-
-            reader.readAsText(file);
+            // Log results to audit
+            auditLog.push(`${result.file}: ${result.message}`);
         });
 
         document.getElementById("viewAuditLogBtn").disabled = false;
-    });
+    }
 
     // View Audit Log
     document.getElementById("viewAuditLogBtn").addEventListener("click", () => {
@@ -136,36 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
         return formatted;
-    }
-
-    function checkAgainstJson(text) {
-        return Object.values(originalData).some((entry) => {
-            return Object.values(entry).some((value) =>
-                typeof value === "string" && text.includes(value.toLowerCase())
-            );
-        });
-    }
-
-    function populateTable(data) {
-        const tbody = document.querySelector("#riskTable tbody");
-        tbody.innerHTML = "";
-
-        if (data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No matching results</td></tr>`;
-            return;
-        }
-
-        data.forEach((item) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${item.Title}</td>
-                <td>${item.Cancer}</td>
-                <td>${item.Risk}</td>
-                <td>${item.Keywords}</td>
-                <td>${item.Authors}</td>
-            `;
-            tbody.appendChild(row);
-        });
     }
 
     function createChart(data) {
